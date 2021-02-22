@@ -1,6 +1,7 @@
 .article {
   margin: 10px;
   line-height: 1.6;
+  white-space: pre-line;
 }
 
 .article span {
