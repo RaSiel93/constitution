@@ -1,0 +1,8 @@
+.article {
+  margin: 10px;
+  line-height: 1.6;
+}
+
+.article span {
+  font-weight: bold;
+}
