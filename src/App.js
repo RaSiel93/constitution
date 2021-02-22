@@ -1,18 +1,12 @@
 import React, {Component} from 'react'
 import './styles/reset.css';
 import './styles/App.css';
-import Constitution from './fixtures/constitution.json'
+import ConstitutionRU from './fixtures/constitution.ru.json'
+import ConstitutionBY from './fixtures/constitution.by.json'
 import Article from './Article'
 import Part from './Part'
 import Modal from 'react-modal';
 
-function articles() {
-  return Constitution.sections.flatMap((section) => {
-    return section.articles || section.parts.flatMap((part) => {
-      return part.articles;
-    })
-  })
-}
 
 Modal.setAppElement('#root');
 
@@ -28,17 +22,31 @@ const customStyles = {
   }
 };
 
+const constitution = {
+  'by': ConstitutionBY,
+  'ru': ConstitutionRU
+}
 
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { search: '', section: Constitution.sections[0], showModal: false }
-    this.articles = articles();
+    const lang = 'by';
+
+    this.state = { lang: lang, search: '', constitution: constitution[lang], section: constitution[lang].sections[0], showModal: false }
+    this.articles = this.loadArticles();
     this.handleSearch = this.handleSearch.bind(this);
     this.toggleMenu = this.toggleMenu.bind(this);
 
     this.handleOpenModal = this.handleOpenModal.bind(this);
     this.handleCloseModal = this.handleCloseModal.bind(this);
+  }
+
+  loadArticles() {
+    return this.state.constitution.sections.flatMap((section) => {
+      return section.articles || section.parts.flatMap((part) => {
+        return part.articles;
+      })
+    })
   }
 
   componentDidMount() {
@@ -74,6 +82,27 @@ class App extends Component {
     this.setState({ showModal: false });
   }
 
+  setLang(lang) {
+    const id = this.state.constitution.sections.indexOf(this.state.section);
+
+    this.setState({ lang: lang, constitution: constitution[lang], section: constitution[lang].sections[id] }, () => {
+      this.articles = this.loadArticles();
+    });
+  }
+
+  t(key) {
+    return {
+        by: {
+          test: 'Выпадковы артыкул',
+          next: 'Наступны'
+        },
+        ru: {
+          test: 'Случайная статья',
+          next: 'Следующая'
+        }
+      }[this.state.lang][key];
+  }
+
   render() {
     return (
       <div className="App">
@@ -83,11 +112,16 @@ class App extends Component {
           <span className="line3"></span>
         </div>
         <ul className="sections">
+          <li className="lang">
+            <a onClick={this.setLang.bind(this, 'by')} className={this.state.lang == 'by' ? 'active' : ''}>BY</a>
+            |
+            <a onClick={this.setLang.bind(this, 'ru')} className={this.state.lang == 'ru' ? 'active' : ''}>RU</a>
+          </li>
           <li className='search'>
             <input type="text" onChange={this.handleSearch} value={this.state.search} placeholder="Поиск"/>
           </li>
           {
-            Constitution.sections.map((section) => {
+            this.state.constitution.sections.map((section) => {
               return <li key={Math.random()} className='section'>
                 <a onClick={this.setSection.bind(this, section)} className={this.state.section == section ? 'active' : ''}>
                   {section.title}
@@ -96,7 +130,7 @@ class App extends Component {
             })
           }
           <li className='actions'>
-            <button onClick={this.handleOpenModal}>Тест</button>
+            <button onClick={this.handleOpenModal}>{this.t('test')}</button>
           </li>
         </ul>
         <div className="content">
@@ -126,6 +160,9 @@ class App extends Component {
             <ul>
               <Article key={Math.random()} article={this.articles[Math.floor(Math.random() * this.articles.length)]}/>
             </ul>
+            <div className="actions">
+              <button onClick={this.handleOpenModal}>{this.t('next')}</button>
+            </div>
           </Modal>
         </div>
       </div>
