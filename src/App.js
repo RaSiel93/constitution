@@ -10,18 +10,6 @@ import Modal from 'react-modal';
 
 Modal.setAppElement('#root');
 
-const customStyles = {
-  content : {
-    top                   : '50%',
-    left                  : '50%',
-    width                 : '80%',
-    right                 : 'auto',
-    bottom                : 'auto',
-    marginRight           : '-50%',
-    transform             : 'translate(-50%, -50%)'
-  }
-};
-
 const constitution = {
   'by': ConstitutionBY,
   'ru': ConstitutionRU
@@ -155,8 +143,8 @@ class App extends Component {
           }
         </div>
         <div>
-          <Modal style={customStyles} isOpen={this.state.showModal}>
-            <p style={{position: 'absolute', top: '10px', right: '10px', cursor: 'pointer'}} onClick={this.handleCloseModal}>X</p>
+          <Modal isOpen={this.state.showModal} className='Modal' onRequestClose={this.handleCloseModal}>
+            <p className='close' onClick={this.handleCloseModal}>×</p>
             <ul>
               <Article key={Math.random()} article={this.articles[Math.floor(Math.random() * this.articles.length)]}/>
             </ul>
