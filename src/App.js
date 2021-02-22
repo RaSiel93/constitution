@@ -1,9 +1,10 @@
-import {Component} from 'react'
+import React, {Component} from 'react'
 import './styles/reset.css';
 import './styles/App.css';
 import Constitution from './fixtures/constitution.json'
 import Article from './Article'
 import Part from './Part'
+import Modal from 'react-modal';
 
 function articles() {
   return Constitution.sections.flatMap((section) => {
@@ -13,13 +14,31 @@ function articles() {
   })
 }
 
+Modal.setAppElement('#root');
+
+const customStyles = {
+  content : {
+    top                   : '50%',
+    left                  : '50%',
+    width                 : '80%',
+    right                 : 'auto',
+    bottom                : 'auto',
+    marginRight           : '-50%',
+    transform             : 'translate(-50%, -50%)'
+  }
+};
+
+
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { search: '', section: Constitution.sections[0] }
+    this.state = { search: '', section: Constitution.sections[0], showModal: false }
     this.articles = articles();
     this.handleSearch = this.handleSearch.bind(this);
     this.toggleMenu = this.toggleMenu.bind(this);
+
+    this.handleOpenModal = this.handleOpenModal.bind(this);
+    this.handleCloseModal = this.handleCloseModal.bind(this);
   }
 
   componentDidMount() {
@@ -47,6 +66,14 @@ class App extends Component {
     return this.sections.classList.toggle('show');
   }
 
+  handleOpenModal () {
+    this.setState({ showModal: true });
+  }
+
+  handleCloseModal () {
+    this.setState({ showModal: false });
+  }
+
   render() {
     return (
       <div className="App">
@@ -68,6 +95,9 @@ class App extends Component {
               </li>
             })
           }
+          <li className='actions'>
+            <button onClick={this.handleOpenModal}>Тест</button>
+          </li>
         </ul>
         <div className="content">
           {
@@ -89,6 +119,14 @@ class App extends Component {
                 </ul>
               </div>
           }
+        </div>
+        <div>
+          <Modal style={customStyles} isOpen={this.state.showModal}>
+            <p style={{position: 'absolute', top: '10px', right: '10px', cursor: 'pointer'}} onClick={this.handleCloseModal}>X</p>
+            <ul>
+              <Article key={Math.random()} article={this.articles[Math.floor(Math.random() * this.articles.length)]}/>
+            </ul>
+          </Modal>
         </div>
       </div>
     );
