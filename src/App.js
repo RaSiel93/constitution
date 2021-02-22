@@ -20,7 +20,7 @@ class App extends Component {
     super(props);
     const lang = 'by';
 
-    this.state = { lang: lang, search: '', constitution: constitution[lang], section: constitution[lang].sections[0], showModal: false }
+    this.state = { lang: lang, search: '', constitution: constitution[lang], section: null, showModal: false }
     this.articles = this.loadArticles();
     this.handleSearch = this.handleSearch.bind(this);
     this.toggleMenu = this.toggleMenu.bind(this);
@@ -31,9 +31,7 @@ class App extends Component {
 
   loadArticles() {
     return this.state.constitution.sections.flatMap((section) => {
-      return section.articles || section.parts.flatMap((part) => {
-        return part.articles;
-      })
+      return section.articles || section.parts.flatMap((part) => part.articles)
     })
   }
 
@@ -42,7 +40,10 @@ class App extends Component {
   }
 
   setSection(section) {
-    this.setState({ section: section, search: '' });
+    if (this.state.section == section) {
+      section = null;
+    }
+    this.setState({ section: section });
   }
 
   handleSearch(event) {
@@ -50,7 +51,15 @@ class App extends Component {
   }
 
   filteredArticles() {
-    return this.articles.filter(
+    let articles = null;
+
+    if(this.state.section !== null) {
+      articles = this.state.section.articles || this.state.section.parts.flatMap((part) => part.articles);
+    } else {
+      articles = this.articles;
+    }
+
+    return articles.filter(
       (article) => {
         return (article.title + article.text).toLowerCase().search(this.state.search.toLowerCase()) !== -1;
       }
@@ -72,23 +81,28 @@ class App extends Component {
 
   setLang(lang) {
     const id = this.state.constitution.sections.indexOf(this.state.section);
+    let section = null
 
-    this.setState({ lang: lang, constitution: constitution[lang], section: constitution[lang].sections[id] }, () => {
+    if (id != -1) {
+      section = constitution[lang].sections[id];
+    }
+
+    this.setState({ lang: lang, constitution: constitution[lang], section: section }, () => {
       this.articles = this.loadArticles();
     });
   }
 
   t(key) {
     return {
-        by: {
-          test: 'Выпадковы артыкул',
-          next: 'Наступны'
-        },
-        ru: {
-          test: 'Случайная статья',
-          next: 'Следующая'
-        }
-      }[this.state.lang][key];
+      by: {
+        test: 'Выпадковы артыкул',
+        next: 'Наступны'
+      },
+      ru: {
+        test: 'Случайная статья',
+        next: 'Следующая'
+      }
+    }[this.state.lang][key];
   }
 
   render() {
@@ -124,15 +138,20 @@ class App extends Component {
         <div className="content">
           {
             this.state.search === ''
-              ? <div>
-                  <h1>{this.state.section.title}</h1>
-                  <ul className="articles">
-                    {this.state.section.parts != null
-                      ? this.state.section.parts.map((part) => <Part key={Math.random()} part={part}/>)
-                      : this.state.section.articles.map((article) => <Article key={Math.random()} article={article}/>)
-                    }
-                  </ul>
-                </div>
+              ? this.state.section !== null
+                ? <div>
+                    <h1>{this.state.section.title}</h1>
+                    <ul className="articles">
+                      {this.state.section.parts != null
+                        ? this.state.section.parts.map((part) => <Part key={Math.random()} part={part}/>)
+                        : this.state.section.articles.map((article) => <Article key={Math.random()} article={article}/>)
+                      }
+                    </ul>
+                  </div>
+                : <div className='main'>
+                    <h1>{this.state.constitution.title}</h1>
+                    <p>{this.state.constitution.description}</p>
+                  </div>
               : <div>
                 <ul>
                   {
