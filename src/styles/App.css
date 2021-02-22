@@ -69,3 +69,58 @@ body {
 .article span {
   font-weight: bold;
 }
+
+.menu {
+  display: none;
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  /*background-color: #ccc;*/
+  right: 10px;
+  top: 10px;
+  cursor: pointer;
+  transition: width 2s;
+}
+
+.menu span {
+  width: 100%;
+  height: 6px;
+  background-color: #ccc;
+  position: absolute;
+  transition: all 0.3s ease;
+}
+
+.menu .line1 {
+  top: 0;
+}
+
+.menu .line2 {
+  top: 15px;
+}
+
+.menu .line3 {
+  top: 30px;
+}
+
+.menu.active .line1 {
+  transform: rotate(45deg) translate(11px, 10px);
+}
+.menu.active .line2 {
+  opacity: 0;
+}
+.menu.active .line3 {
+  transform: rotate(-45deg) translate(11px, -10px);
+}
+
+.sections.show {
+  display: block;
+}
+
+@media only screen and (max-width: 600px) {
+  .sections {
+    display: none;
+  }
+  .menu {
+    display: block;
+  }
+}

@@ -18,14 +18,19 @@ class App extends Component {
     super(props);
     this.state = { search: '', section: Constitution.sections[0] }
     this.articles = articles();
-    this.changeSearch = this.changeSearch.bind(this);
+    this.handleSearch = this.handleSearch.bind(this);
+    this.toggleMenu = this.toggleMenu.bind(this);
+  }
+
+  componentDidMount() {
+    this.sections = document.getElementsByClassName('sections')[0];
   }
 
   setSection(section) {
     this.setState({ section: section, search: '' });
   }
 
-  changeSearch(event) {
+  handleSearch(event) {
     this.setState({ search: event.target.value });
   }
 
@@ -37,12 +42,22 @@ class App extends Component {
     );
   }
 
+  toggleMenu(event) {
+    event.target.closest('.menu').classList.toggle('active');
+    return this.sections.classList.toggle('show');
+  }
+
   render() {
     return (
       <div className="App">
+        <div className="menu" onClick={this.toggleMenu}>
+          <span className="line1"></span>
+          <span className="line2"></span>
+          <span className="line3"></span>
+        </div>
         <ul className="sections">
           <li className='search'>
-            <input type="text" onChange={this.changeSearch} value={this.state.search} placeholder="Поиск"/>
+            <input type="text" onChange={this.handleSearch} value={this.state.search} placeholder="Поиск"/>
           </li>
           {
             Constitution.sections.map((section) => {
